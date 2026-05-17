@@ -21,9 +21,10 @@ on:
         type: string
         default: "us-east-1"
 
+    secrets:
       role-to-assume:
         required: true
-        type: string
+
 
 jobs:
   terraform:
