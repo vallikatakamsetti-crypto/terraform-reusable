@@ -1,0 +1,49 @@
+name: Terraform Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      terraform-command:
+        required: true
+        type: string
+
+      working-directory:
+        required: false
+        type: string
+        default: "."
+
+      aws-region:
+        required: false
+        type: string
+        default: "us-east-1"
+
+      role-to-assume:
+        required: true
+        type: string
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ inputs.role-to-assume }}
+          aws-region: ${{ inputs.aws-region }}
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Command
+        run: terraform ${{ inputs.terraform-command }}
